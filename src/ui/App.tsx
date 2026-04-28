@@ -196,7 +196,7 @@ export function App({ intervalSeconds, initialShowAll = false, debug = false }: 
         </Box>
       )}
 
-      {data !== null && <Bars data={data} width={width} />}
+      {data !== null && <Bars data={data} width={width} now={now} />}
 
       {data === null && !error && <Text dimColor>Loading usage data…</Text>}
 
@@ -241,19 +241,58 @@ function DebugPanel({ details }: { details: DebugDetails }) {
   )
 }
 
-function Bars({ data, width }: { data: Utilization; width: number }) {
+const FIVE_HOURS_MS = 5 * 60 * 60 * 1000
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+
+function Bars({ data, width, now }: { data: Utilization; width: number; now: number }) {
   const bars: React.ReactNode[] = []
   if (data.five_hour) {
-    bars.push(<LimitBar key="5h" title="Current session (5h)" limit={data.five_hour} width={width} />)
+    bars.push(
+      <LimitBar
+        key="5h"
+        title="Current session (5h)"
+        limit={data.five_hour}
+        width={width}
+        windowMs={FIVE_HOURS_MS}
+        now={now}
+      />,
+    )
   }
   if (data.seven_day) {
-    bars.push(<LimitBar key="7d" title="Current week (all models)" limit={data.seven_day} width={width} />)
+    bars.push(
+      <LimitBar
+        key="7d"
+        title="Current week (all models)"
+        limit={data.seven_day}
+        width={width}
+        windowMs={SEVEN_DAYS_MS}
+        now={now}
+      />,
+    )
   }
   if (data.seven_day_sonnet) {
-    bars.push(<LimitBar key="7ds" title="Current week (Sonnet only)" limit={data.seven_day_sonnet} width={width} />)
+    bars.push(
+      <LimitBar
+        key="7ds"
+        title="Current week (Sonnet only)"
+        limit={data.seven_day_sonnet}
+        width={width}
+        windowMs={SEVEN_DAYS_MS}
+        now={now}
+      />,
+    )
   }
   if (data.seven_day_opus) {
-    bars.push(<LimitBar key="7do" title="Current week (Opus only)" limit={data.seven_day_opus} width={width} />)
+    bars.push(
+      <LimitBar
+        key="7do"
+        title="Current week (Opus only)"
+        limit={data.seven_day_opus}
+        width={width}
+        windowMs={SEVEN_DAYS_MS}
+        now={now}
+      />,
+    )
   }
   if (data.extra_usage) {
     bars.push(<ExtraUsageBar key="extra" extraUsage={data.extra_usage} width={width} />)

@@ -69,6 +69,8 @@ For each rate limit returned by `/api/oauth/usage`, a colored progress bar (gree
 - **Current week (Opus only)** — when present
 - **Extra usage (this month)** — credits used vs monthly limit, when enabled
 
+Each rate-limit bar also shows a vertical **pace marker** (`│`) at the position usage would be at if it were spread evenly across the window. The marker is **red** when current usage is past it (over-pace), **green** when behind (headroom remaining), and white when within ±0.5%. The percent text reads e.g. `60% used (target 50%)`. The extra-usage bar has no pace marker (no window-end timestamp is returned for it).
+
 A footer shows when the data was last fetched and how many seconds until the next refresh.
 
 ### Rate limiting

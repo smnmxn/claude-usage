@@ -1,4 +1,4 @@
-import { Text } from 'ink'
+import { Box, Text } from 'ink'
 
 const BLOCKS = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█']
 
@@ -7,10 +7,12 @@ type Props = {
   width: number
   fillColor?: string
   emptyColor?: string
+  markerRatio?: number
+  markerColor?: string
+  markerChar?: string
 }
 
-export function ProgressBar({ ratio: input, width, fillColor, emptyColor }: Props) {
-  const ratio = Math.min(1, Math.max(0, input))
+function buildBar(ratio: number, width: number): string {
   const whole = Math.floor(ratio * width)
   const last = BLOCKS[BLOCKS.length - 1] ?? '█'
   const segments: string[] = [last.repeat(whole)]
@@ -21,9 +23,49 @@ export function ProgressBar({ ratio: input, width, fillColor, emptyColor }: Prop
     const empty = width - whole - 1
     if (empty > 0) segments.push((BLOCKS[0] ?? ' ').repeat(empty))
   }
+  return segments.join('')
+}
+
+export function ProgressBar({
+  ratio: input,
+  width,
+  fillColor,
+  emptyColor,
+  markerRatio,
+  markerColor,
+  markerChar = '│',
+}: Props) {
+  const ratio = Math.min(1, Math.max(0, input))
+  const bar = buildBar(ratio, width)
+
+  if (markerRatio === undefined || !Number.isFinite(markerRatio)) {
+    return (
+      <Text color={fillColor} backgroundColor={emptyColor}>
+        {bar}
+      </Text>
+    )
+  }
+
+  const clampedMarker = Math.min(1, Math.max(0, markerRatio))
+  const markerCol = Math.min(width - 1, Math.max(0, Math.round(clampedMarker * width)))
+  const pre = bar.slice(0, markerCol)
+  const post = bar.slice(markerCol + 1)
+
   return (
-    <Text color={fillColor} backgroundColor={emptyColor}>
-      {segments.join('')}
-    </Text>
+    <Box flexDirection="row">
+      {pre.length > 0 && (
+        <Text color={fillColor} backgroundColor={emptyColor}>
+          {pre}
+        </Text>
+      )}
+      <Text color={markerColor} backgroundColor={emptyColor} bold>
+        {markerChar}
+      </Text>
+      {post.length > 0 && (
+        <Text color={fillColor} backgroundColor={emptyColor}>
+          {post}
+        </Text>
+      )}
+    </Box>
   )
 }
